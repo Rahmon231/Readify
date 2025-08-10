@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "80544266319",
+    "project_id": "lemzyreadify",
+    "storage_bucket": "lemzyreadify.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:80544266319:android:23c897dfcc7ed70f72123a",
+        "android_client_info": {
+          "package_name": "com.dev.readify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4Bv461kaT4noG6oh0qdf-o7mwAxDbV6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,5 @@
 name: Android CI with Appetize Upload
 
-
 on:
   push:
     branches: [ "main" ]

@@ -6,7 +6,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun ReadifySplashScreen(navController : NavController){
-    Text(text = "Hello Readify")
+    Text(text = "Hello Readify Splash Screen")
 
 
 }

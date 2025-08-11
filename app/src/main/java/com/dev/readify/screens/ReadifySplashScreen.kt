@@ -23,6 +23,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.dev.readify.components.ReadifyLogo
+import com.dev.readify.navigation.ReadifyScreens
 import kotlinx.coroutines.delay
 
 @Composable
@@ -39,6 +41,7 @@ fun ReadifySplashScreen(navController : NavController){
                         .getInterpolation(it)
                 }))
         delay(2000L)
+        navController.navigate(ReadifyScreens.LoginScreen.name)
     }
 
     Surface(modifier = Modifier
@@ -53,9 +56,7 @@ fun ReadifySplashScreen(navController : NavController){
             modifier = Modifier.padding(1.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally){
-            Text(text = "Readify",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.Red.copy(alpha = 0.5f))
+            ReadifyLogo()
             Spacer(modifier = Modifier.height(15.dp))
             Text(text = "Read, Learn, Repeat",
                 style = MaterialTheme.typography.headlineSmall,
@@ -66,3 +67,4 @@ fun ReadifySplashScreen(navController : NavController){
 
 
 }
+

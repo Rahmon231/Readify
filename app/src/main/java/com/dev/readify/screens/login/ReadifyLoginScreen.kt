@@ -2,13 +2,17 @@ package com.dev.readify.screens.login
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -34,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.dev.readify.R
 import com.dev.readify.components.EmailInput
 import com.dev.readify.components.PasswordInput
 import com.dev.readify.components.ReadifyLogo
@@ -51,16 +57,41 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ReadifyLoginScreen(navController: NavController){
+    val showLoginForm = rememberSaveable { mutableStateOf(true) }
+
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally) {
             ReadifyLogo()
-            UserForm(){ email, password ->
-                //navController.navigate(ReadifyScreens.HomeScreen.name)
-                Log.d("Form", "ReadifyLoginScreen: $email, $password")
+            if (showLoginForm.value) {
+                UserForm() { email, password ->
+                    //TODO: FB Login
+                }
+            }else{
+                UserForm(loading = false, isCreateAccount = true) { email, password ->
+                    //TODO: FB Create Account
+
+                }
             }
 
         }
+        Spacer(modifier = Modifier.height(15.dp))
+        Row(modifier = Modifier.padding(15.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically) {
+            val text = if (showLoginForm.value) "Sign up" else "Login"
+            Text(text = "New User?")
+            Text(text = text,
+                modifier = Modifier
+                    .padding(start = 5.dp)
+                    .clickable {
+                        showLoginForm.value = !showLoginForm.value
+                    },
+                fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
+                color = MaterialTheme.colorScheme.primary)
+
+        }
+
     }
 }
 @Preview
@@ -87,6 +118,9 @@ fun UserForm(
 
     Column(modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally) {
+        if (isCreateAccount) Text(text = stringResource(R.string.create_acct), modifier = Modifier.padding(4.dp))
+        else Text(text = "")
+
         EmailInput(emailState = email, enabled = !loading, onAction = KeyboardActions {
             coroutineScope.launch {
                 passwordFocusRequest.requestFocus()

@@ -1,6 +1,7 @@
 package com.dev.readify.screens.login
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,10 +26,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,52 +54,92 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dev.readify.R
 import com.dev.readify.components.EmailInput
 import com.dev.readify.components.PasswordInput
 import com.dev.readify.components.ReadifyLogo
+import com.dev.readify.model.Response
 import com.dev.readify.navigation.ReadifyScreens
 import kotlinx.coroutines.launch
 
 @Composable
-fun ReadifyLoginScreen(navController: NavController){
+fun ReadifyLoginScreen(navController: NavController,
+                       loginViewModel: LoginViewModel = hiltViewModel()){
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
+    val loginState by loginViewModel.loginState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            ReadifyLogo()
-            if (showLoginForm.value) {
-                UserForm() { email, password ->
-                    //TODO: FB Login
-                }
-            }else{
-                UserForm(loading = false, isCreateAccount = true) { email, password ->
-                    //TODO: FB Create Account
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) {
+        Surface(modifier = Modifier.fillMaxSize().padding(it)) {
+            Column(verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                ReadifyLogo()
+                if (showLoginForm.value) {
+                    UserForm(
+                        loading = loginState is Response.Loading
+                    ) { email, password ->
+                        loginViewModel.login(email, password)
+                    }
+                }else{
+                    UserForm(loading = loginState is Response.Loading, isCreateAccount = true) { email, password ->
+                        //TODO: FB Create Account
 
+                    }
                 }
+
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(modifier = Modifier.padding(15.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically) {
+                val text = if (showLoginForm.value) "Sign up" else "Login"
+                Text(text = if (showLoginForm.value) "New User?" else "Existing User?")
+                Text(text = text,
+                    modifier = Modifier
+                        .padding(start = 5.dp)
+                        .clickable {
+                            showLoginForm.value = !showLoginForm.value
+                        },
+                    fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
+                    color = MaterialTheme.colorScheme.primary)
+
             }
 
         }
-        Spacer(modifier = Modifier.height(15.dp))
-        Row(modifier = Modifier.padding(15.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically) {
-            val text = if (showLoginForm.value) "Sign up" else "Login"
-            Text(text = "New User?")
-            Text(text = text,
-                modifier = Modifier
-                    .padding(start = 5.dp)
-                    .clickable {
-                        showLoginForm.value = !showLoginForm.value
-                    },
-                fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
-                color = MaterialTheme.colorScheme.primary)
+    }
 
+
+    when (loginState) {
+        is Response.Loading -> {
+            // Already handled by `loading` in UserForm
         }
 
+        is Response.Success -> {
+            LaunchedEffect(Unit) {
+                navController.navigate(ReadifyScreens.HomeScreen.name) {
+                    popUpTo(ReadifyScreens.LoginScreen.name) { inclusive = true }
+                }
+            }
+        }
+
+        is Response.Error -> {
+            val message = (loginState as Response.Error).message
+            LaunchedEffect(message) {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(message)
+                }
+                Log.e("LoginError", message)
+            }
+        }
+
+        Response.Idle -> {}
     }
+
 }
 @Preview
 @Composable

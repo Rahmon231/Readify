@@ -6,6 +6,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -69,6 +75,12 @@ fun InputField(
         onValueChange = {valueState.value = it},
         label = { Text(text = labelId) },
         singleLine = isSingleLine,
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Email,
+                contentDescription = "Email Icon"
+            )
+        },
         textStyle = TextStyle(fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground),
         modifier = modifier.padding(bottom = 10.dp, start = 10.dp, end = 10.dp).fillMaxWidth(),
         enabled = enabled,
@@ -106,6 +118,12 @@ fun PasswordInput(
         ),
         visualTransformation = visualTransformation,
         trailingIcon = { PasswordVisibility(passwordVisibility = passwordVisibility) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = "Password Icon"
+            )
+        },
         keyboardActions = onAction
 
 
@@ -118,6 +136,9 @@ fun PasswordVisibility(passwordVisibility: MutableState<Boolean>) {
     IconButton(onClick = {
         passwordVisibility.value = !visible
     }) {
-        Icons.Default.Close
+        Icon(
+            imageVector = if (visible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+            contentDescription = if (visible) "Hide password" else "Show password"
+        )
     }
 }

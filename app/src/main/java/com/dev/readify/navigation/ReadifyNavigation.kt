@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.dev.readify.screens.ReadifySplashScreen
+import com.dev.readify.splash.ReadifySplashScreen
 import com.dev.readify.screens.details.ReadifyDetailsScreen
 import com.dev.readify.screens.home.ReadifyHomeScreen
 import com.dev.readify.screens.login.ReadifyLoginScreen

@@ -1,4 +1,4 @@
-package com.dev.readify.screens
+package com.dev.readify.splash
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
@@ -16,22 +16,32 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dev.readify.components.ReadifyLogo
 import com.dev.readify.navigation.ReadifyScreens
 import kotlinx.coroutines.delay
 
 @Composable
-fun ReadifySplashScreen(navController : NavController){
+fun ReadifySplashScreen(navController : NavController,
+                        splashViewModel: SplashViewModel = hiltViewModel()
+){
     val scale = remember {
         Animatable(0f)
     }
+    var navigated by remember { mutableStateOf(false) }
+
+    val isAuthenticated by splashViewModel.isAuthenticated.collectAsState()
     LaunchedEffect(key1 = true) {
         scale.animateTo(
             targetValue = 0.9f,
@@ -40,9 +50,23 @@ fun ReadifySplashScreen(navController : NavController){
                     OvershootInterpolator(8f)
                         .getInterpolation(it)
                 }))
-        delay(2000L)
-        navController.navigate(ReadifyScreens.LoginScreen.name)
     }
+    LaunchedEffect(isAuthenticated) { // react whenever isAuthenticated changes
+        if (!navigated && isAuthenticated != null) {
+            navigated = true
+            delay(2000L) // splash delay
+            if (isAuthenticated == true) {
+                navController.navigate(ReadifyScreens.HomeScreen.name) {
+                    popUpTo(ReadifyScreens.SplashScreen.name) { inclusive = true }
+                }
+            } else {
+                navController.navigate(ReadifyScreens.LoginScreen.name) {
+                    popUpTo(ReadifyScreens.SplashScreen.name) { inclusive = true }
+                }
+            }
+        }
+    }
+
 
     Surface(modifier = Modifier
         .padding(15.dp)

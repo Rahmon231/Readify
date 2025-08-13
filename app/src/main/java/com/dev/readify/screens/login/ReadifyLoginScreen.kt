@@ -69,6 +69,7 @@ fun ReadifyLoginScreen(navController: NavController,
                        loginViewModel: LoginViewModel = hiltViewModel()){
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
     val loginState by loginViewModel.loginState.collectAsState()
+    val registerState by loginViewModel.registerState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
@@ -87,7 +88,7 @@ fun ReadifyLoginScreen(navController: NavController,
                     }
                 }else{
                     UserForm(loading = loginState is Response.Loading, isCreateAccount = true) { email, password ->
-                        //TODO: FB Create Account
+                        loginViewModel.register(email, password)
 
                     }
                 }
@@ -139,6 +140,33 @@ fun ReadifyLoginScreen(navController: NavController,
 
         Response.Idle -> {}
     }
+
+    when (registerState) {
+        is Response.Loading -> {
+            // Already handled by `loading` in UserForm
+        }
+
+        is Response.Success -> {
+            LaunchedEffect(Unit) {
+                navController.navigate(ReadifyScreens.HomeScreen.name) {
+                    popUpTo(ReadifyScreens.LoginScreen.name) { inclusive = true }
+                }
+            }
+        }
+
+        is Response.Error -> {
+            val message = (registerState as Response.Error).message
+            LaunchedEffect(message) {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(message)
+                }
+                Log.e("Register Error", message)
+            }
+        }
+
+        Response.Idle -> {}
+    }
+
 
 }
 @Preview

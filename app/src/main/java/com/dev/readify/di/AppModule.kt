@@ -3,6 +3,7 @@ package com.dev.readify.di
 import com.dev.readify.repository.AuthenticationRepository
 import com.dev.readify.repository.AuthenticationRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +19,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    @Provides
+    @Singleton
     fun provideAuthenticationRepository(
-        auth: FirebaseAuth
-    ): AuthenticationRepository = AuthenticationRepositoryImpl(auth)
+        auth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ): AuthenticationRepository = AuthenticationRepositoryImpl(auth, firestore)
 }

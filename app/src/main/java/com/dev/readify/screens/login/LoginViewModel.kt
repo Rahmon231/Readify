@@ -18,6 +18,9 @@ class LoginViewModel @Inject constructor(
 
     private val _loginState = MutableStateFlow<Response<AuthResult>>(Response.Idle)
     val loginState: StateFlow<Response<AuthResult>> = _loginState
+    private val _registerState = MutableStateFlow<Response<AuthResult>>(Response.Idle)
+    val registerState: StateFlow<Response<AuthResult>> = _registerState
+
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
@@ -26,4 +29,14 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    fun register(email: String, password: String) {
+        viewModelScope.launch {
+            repository.register(email, password).collect {
+                _registerState.value = it
+
+            }
+        }
+    }
+
 }

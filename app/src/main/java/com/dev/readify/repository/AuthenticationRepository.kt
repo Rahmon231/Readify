@@ -18,4 +18,6 @@ interface AuthenticationRepository {
 
     suspend fun isLoggedIn(): Boolean
 
+    suspend fun observeUsername(uid: String): Flow<String?>
+
 }

@@ -5,7 +5,9 @@ import com.dev.readify.model.Response
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -63,5 +65,19 @@ class AuthenticationRepositoryImpl @Inject constructor(
             emit(Response.Error(e.localizedMessage ?: "Oops, something went wrong."))
         }
     }
+
+    override suspend fun observeUsername(uid: String): Flow<String?> = callbackFlow {
+        val listener = firestore.collection("users")
+            .document(uid)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(null)
+                    return@addSnapshotListener
+                }
+                trySend(snapshot?.getString("display_name"))
+            }
+        awaitClose { listener.remove() }
+    }
+
 
 }

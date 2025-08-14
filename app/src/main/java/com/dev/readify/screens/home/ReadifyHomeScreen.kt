@@ -86,7 +86,7 @@ fun ReadifyHomeScreen(navController: NavController,
         },
         floatingActionButton = {
             FABContent{
-
+                navController.navigate(ReadifyScreens.SearchScreen.name)
             }
         },
     ) {

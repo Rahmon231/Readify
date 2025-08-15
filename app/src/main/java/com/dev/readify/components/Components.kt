@@ -115,6 +115,7 @@ fun InputField(
     isSingleLine: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
+    leadingIcon : ImageVector = Icons.Default.Email,
     onAction: KeyboardActions = KeyboardActions.Default
 ) {
     OutlinedTextField(
@@ -124,7 +125,7 @@ fun InputField(
         singleLine = isSingleLine,
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Email,
+                imageVector = leadingIcon,
                 contentDescription = "Email Icon"
             )
         },

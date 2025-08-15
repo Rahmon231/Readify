@@ -1,13 +1,17 @@
 package com.dev.readify.di
 
+import com.dev.readify.network.BookApi
 import com.dev.readify.repository.AuthenticationRepository
 import com.dev.readify.repository.AuthenticationRepositoryImpl
+import com.dev.readify.utils.BASE_URL
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -27,4 +31,14 @@ object AppModule {
         auth: FirebaseAuth,
         firestore: FirebaseFirestore
     ): AuthenticationRepository = AuthenticationRepositoryImpl(auth, firestore)
+
+    @Provides
+    @Singleton
+    fun provideGoogleBooksApi() : BookApi{
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(BookApi::class.java)
+    }
 }

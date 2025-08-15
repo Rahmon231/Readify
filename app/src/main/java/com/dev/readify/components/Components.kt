@@ -1,6 +1,15 @@
 package com.dev.readify.components
 
 import android.util.Log
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,6 +33,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Password
@@ -45,11 +56,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -113,6 +128,7 @@ fun InputField(
     labelId: String,
     enabled: Boolean,
     isSingleLine: Boolean = true,
+    onValueChange: (String) -> Unit = {valueState.value = it},
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
     leadingIcon : ImageVector = Icons.Default.Email,
@@ -120,7 +136,7 @@ fun InputField(
 ) {
     OutlinedTextField(
         value = valueState.value,
-        onValueChange = {valueState.value = it},
+        onValueChange = onValueChange,
         label = { Text(text = labelId) },
         singleLine = isSingleLine,
         leadingIcon = {
@@ -414,3 +430,102 @@ fun ListCard(book: MBook
         }
     }
 }
+
+@Composable
+fun AnimatedHourglass(
+    modifier: Modifier = Modifier.size(100.dp),
+    color: Color = Color(0xFF3F51B5)
+) {
+    val infiniteTransition = rememberInfiniteTransition()
+
+    // Animate falling sand
+    val sandY by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 800, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
+    )
+
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+
+        // Draw top triangle (emptying)
+        drawPath(
+            path = Path().apply {
+                moveTo(0f, 0f)
+                lineTo(w, 0f)
+                lineTo(w/2, h/2)
+                close()
+            },
+            color = color.copy(alpha = 0.3f)
+        )
+
+        // Draw bottom triangle (filling)
+        drawPath(
+            path = Path().apply {
+                moveTo(0f, h)
+                lineTo(w, h)
+                lineTo(w/2, h/2)
+                close()
+            },
+            color = color.copy(alpha = 0.3f)
+        )
+
+        // Draw falling sand (small circle)
+        val sandStartY = h * 0.2f
+        val sandEndY = h * 0.8f
+        val sandX = w / 2
+        val sandCurrentY = sandStartY + (sandEndY - sandStartY) * sandY
+
+        drawCircle(
+            color = color,
+            radius = w * 0.05f,
+            center = Offset(sandX, sandCurrentY)
+        )
+    }
+}
+
+@Composable
+fun ErrorAnimation(message: String = "Something went wrong") {
+    // Infinite transition for bouncing
+    val infiniteTransition = rememberInfiniteTransition()
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 0.8f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(700, easing = EaseInOutCubic),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Error icon (can be replaced with any vector/image)
+        Icon(
+            imageVector = Icons.Default.Error,
+            contentDescription = "Error",
+            tint = Color.Red,
+            modifier = Modifier
+                .size(80.dp)
+                .scale(scale)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = message,
+            color = Color.Red,
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+

@@ -2,8 +2,11 @@ package com.dev.readify.screens.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dev.readify.data.BookState
+import com.dev.readify.model.Book
 import com.dev.readify.model.MBook
 import com.dev.readify.repository.AuthenticationRepository
+import com.dev.readify.repository.BookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,10 +15,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val repository: AuthenticationRepository
+    private val repository: AuthenticationRepository,
+    private val bookRepository: BookRepository
 ) : ViewModel() {
-    private val _listOfBooks = MutableStateFlow<List<MBook>>(emptyList())
-    val listOfBooks: StateFlow<List<MBook>> = _listOfBooks
+    private val _listOfDummyBooks = MutableStateFlow<List<MBook>>(emptyList())
+    val listOfDummyBooks: StateFlow<List<MBook>> = _listOfDummyBooks
+
+    private val _bookState = MutableStateFlow<BookState<Book>>(BookState.Loading)
+    val bookState: StateFlow<BookState<Book>> = _bookState
+
     init {
         viewModelScope.launch {
             loadDummyBooks()
@@ -23,7 +31,7 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun loadDummyBooks() {
-        _listOfBooks.value = listOf(
+        _listOfDummyBooks.value = listOf(
             MBook(
                 id = "1",
                 title = "Android Development Essentials",
@@ -146,5 +154,12 @@ class SearchViewModel @Inject constructor(
             )
 
         )
+    }
+
+    fun searchBooks(query: String) {
+        viewModelScope.launch {
+            _bookState.value = BookState.Loading
+            _bookState.value = bookRepository.searchBooks(query)
+        }
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,12 +29,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -71,6 +74,7 @@ import com.dev.readify.components.ListCard
 import com.dev.readify.components.ReadifyAppBar
 import com.dev.readify.components.RoundedButton
 import com.dev.readify.components.TitleSection
+import com.dev.readify.data.BookState
 import com.dev.readify.model.MBook
 import com.dev.readify.navigation.ReadifyScreens
 
@@ -102,6 +106,7 @@ fun ReadifyHomeScreen(navController: NavController,
 fun HomeContent(navController: NavController, homeScreenViewModel: HomeScreenViewModel){
     val username by homeScreenViewModel.username.collectAsState()
     val listOfBooks by homeScreenViewModel.listOfBooks.collectAsState()
+    val booksState by homeScreenViewModel.booksState.collectAsState()
 
     Column(modifier = Modifier.padding(2.dp),
         verticalArrangement = Arrangement.Top) {
@@ -128,19 +133,42 @@ fun HomeContent(navController: NavController, homeScreenViewModel: HomeScreenVie
             }
         }
 
-        ReadingNowArea(listOfBooks, navController)
+        when (booksState){
+            is BookState.Loading -> {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+            is BookState.Success -> {
+                val bookList = (booksState as BookState.Success<List<MBook>>).data
+                ReadingNowArea(bookList, navController)
 
-        TitleSection(label = " Reading List")
+                TitleSection(label = " Reading List")
+                BookListArea(listOfBooks = bookList, navController)
+            }
+            is BookState.Failure -> {
+                val e = (booksState as BookState.Failure).throwable.localizedMessage
+                if (e != null) {
+                    Text(text = e.toString() ?: "Unknown error")
+                }
+            }
+            else -> {}
 
-        BookListArea(listOfBooks = listOfBooks, navController)
+        }
+
+//        ReadingNowArea(listOfBooks, navController)
+//
+//        TitleSection(label = " Reading List")
+//
+//        BookListArea(listOfBooks = listOfBooks, navController)
 
     }
 }
 
 @Composable
 fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
-    HorizontalScrollableComponent(listOfBooks){ book ->
-       // navController.navigate(ReadifyScreens.DetailsScreen.name + "/$book")
+    HorizontalScrollableComponent(listOfBooks){ bookId ->
+       //navController.navigate(ReadifyScreens.DetailsScreen.name + "/$bookId")
     }
 }
 
@@ -154,7 +182,7 @@ fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onBookClick : (Strin
         .horizontalScroll(scrollState)
     ) {
         for (book in listOfBooks){
-            ListCard(book){
+            ListCard(book, label = "Not Started"){
                 onBookClick(it)
             }
         }
@@ -164,7 +192,7 @@ fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onBookClick : (Strin
 
 @Composable
 fun ReadingNowArea(books : List<MBook>, navController: NavController){
-    ListCard()
+    ListCard(books[0], label = "Reading Now")
 }
 
 

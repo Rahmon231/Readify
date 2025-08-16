@@ -58,5 +58,14 @@ class BookRepository @Inject constructor(
             Result.failure(e)
         }
     }
+    suspend fun getAllBooks(): BookState<List<MBook>> {
+        return try {
+            val snapshot = booksCollection.get().await()
+            val books = snapshot.toObjects(MBook::class.java)
+            BookState.Success(books)
+        } catch (e: Exception) {
+            BookState.Failure(e)
+        }
+    }
 
 }

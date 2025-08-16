@@ -376,8 +376,15 @@ fun BookRating(score: Double = 4.5) {
 
 @Preview
 @Composable
-fun ListCard(book: MBook
-             = (MBook("123", "Java For Beginners","Rahmon Akanbi", "Welcome to java for beginners","", listOf("programming"))),
+fun ListCard(book:
+             MBook = (MBook(
+        id = "123",
+        title = "Java For Beginners",
+        authors = "Rahmon Akanbi",
+        notes = "Welcome to java for beginners",
+        photoUrl = "",
+        categories = listOf("programming"))),
+             label: String = "Reading",
              onCardPressed: (String) -> Unit = {}){
     val context = LocalContext.current
     val resources = context.resources
@@ -409,7 +416,7 @@ fun ListCard(book: MBook
             Row(horizontalArrangement = Arrangement.Center) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data("http://books.google.com/books/content?id=1C3yNgqZnUkC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api")
+                        .data(book.photoUrl)
                         .crossfade(true)
                         .build(),
                     placeholder = painterResource(R.drawable.ic_launcher_background),
@@ -450,7 +457,7 @@ fun ListCard(book: MBook
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.Bottom
             ) {
-                RoundedButton(label = "Reading", radius = 29)
+                RoundedButton(label = label, radius = 29)
             }
 
         }

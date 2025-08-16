@@ -2,8 +2,10 @@ package com.dev.readify.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dev.readify.data.BookState
 import com.dev.readify.model.MBook
 import com.dev.readify.repository.AuthenticationRepository
+import com.dev.readify.repository.BookRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val repository: AuthenticationRepository
+    private val repository: AuthenticationRepository,
+    private val bookRepository: BookRepository
 ) : ViewModel() {
     private val _username = MutableStateFlow<String?>(null)
     val username: StateFlow<String?> = _username
@@ -21,14 +24,30 @@ class HomeScreenViewModel @Inject constructor(
     private val _listOfBooks = MutableStateFlow<List<MBook>>(emptyList())
     val listOfBooks: StateFlow<List<MBook>> = _listOfBooks
 
+    private val _booksState = MutableStateFlow<BookState<List<MBook>>?>(null)
+    val booksState: StateFlow<BookState<List<MBook>>?> = _booksState
+
     init {
         viewModelScope.launch {
+            fetchBooks()
             loadDummyBooks()
             val uid = repository.userUid()
             if (uid.isNotEmpty()) {
                 repository.observeUsername(uid).collect { name ->
                     _username.value = name
                 }
+            }
+        }
+    }
+
+    fun fetchBooks() {
+        viewModelScope.launch {
+            _booksState.value = BookState.Loading
+            try {
+                val result = bookRepository.getAllBooks() // returns BookState<List<MBook>>
+                _booksState.value = result // assign directly
+            } catch (e: Exception) {
+                _booksState.value = BookState.Failure(e)
             }
         }
     }

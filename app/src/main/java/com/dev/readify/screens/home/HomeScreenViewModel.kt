@@ -40,7 +40,7 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    fun fetchBooks() {
+    private fun fetchBooks() {
         viewModelScope.launch {
             _booksState.value = BookState.Loading
             try {

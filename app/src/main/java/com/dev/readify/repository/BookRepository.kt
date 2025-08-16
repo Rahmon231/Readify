@@ -11,7 +11,8 @@ import javax.inject.Inject
 
 class BookRepository @Inject constructor(
     private val bookApi: BookApi,
-    private val booksCollection: CollectionReference
+    private val booksCollection: CollectionReference,
+    private val authenticationRepository: AuthenticationRepository
 ) {
     // Function to search books by a query
     suspend fun searchBooks(query: String): BookState<Book> {
@@ -60,12 +61,19 @@ class BookRepository @Inject constructor(
     }
     suspend fun getAllBooks(): BookState<List<MBook>> {
         return try {
-            val snapshot = booksCollection.get().await()
+            val userId = authenticationRepository.userUid()
+                ?: return BookState.Failure(Exception("User not logged in"))
+            val snapshot = booksCollection
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
+
             val books = snapshot.toObjects(MBook::class.java)
             BookState.Success(books)
         } catch (e: Exception) {
             BookState.Failure(e)
         }
     }
+
 
 }

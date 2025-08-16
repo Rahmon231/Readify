@@ -405,7 +405,7 @@ fun ListCard(book:
             .width(202.dp)
             .clickable {
                 Log.d("Book Details", "ListCard: ${book.id}")
-                onCardPressed.invoke(book.id.toString())
+                onCardPressed.invoke(book.googleBookId.toString())
             }
 
     ) {

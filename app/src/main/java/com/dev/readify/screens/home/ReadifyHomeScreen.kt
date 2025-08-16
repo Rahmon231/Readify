@@ -168,7 +168,7 @@ fun HomeContent(navController: NavController, homeScreenViewModel: HomeScreenVie
 @Composable
 fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
     HorizontalScrollableComponent(listOfBooks){ bookId ->
-       //navController.navigate(ReadifyScreens.DetailsScreen.name + "/$bookId")
+       navController.navigate(ReadifyScreens.DetailsScreen.name + "/$bookId")
     }
 }
 
@@ -192,7 +192,9 @@ fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onBookClick : (Strin
 
 @Composable
 fun ReadingNowArea(books : List<MBook>, navController: NavController){
-    ListCard(books[0], label = "Reading Now")
+    ListCard(books[0], label = "Reading Now"){ bookId ->
+        navController.navigate(ReadifyScreens.DetailsScreen.name + "/${bookId}")
+    }
 }
 
 

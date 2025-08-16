@@ -73,6 +73,7 @@ import com.dev.readify.components.FABContent
 import com.dev.readify.components.ListCard
 import com.dev.readify.components.ReadifyAppBar
 import com.dev.readify.components.RoundedButton
+import com.dev.readify.components.ThreeDotLoading
 import com.dev.readify.components.TitleSection
 import com.dev.readify.data.BookState
 import com.dev.readify.model.MBook
@@ -135,8 +136,8 @@ fun HomeContent(navController: NavController, homeScreenViewModel: HomeScreenVie
 
         when (booksState){
             is BookState.Loading -> {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    ThreeDotLoading()
                 }
             }
             is BookState.Success -> {

@@ -53,6 +53,7 @@ import com.dev.readify.components.AnimatedHourglass
 import com.dev.readify.components.ErrorAnimation
 import com.dev.readify.components.ReadifyAppBar
 import com.dev.readify.components.RoundedButton
+import com.dev.readify.components.ThreeDotLoading
 import com.dev.readify.data.BookState
 import com.dev.readify.model.Item
 import com.dev.readify.model.MBook
@@ -322,7 +323,8 @@ fun ShowBookDetails(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AnimatedHourglass()
+                //AnimatedHourglass()
+                ThreeDotLoading()
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("Saving book...", style = MaterialTheme.typography.bodyMedium)
             }

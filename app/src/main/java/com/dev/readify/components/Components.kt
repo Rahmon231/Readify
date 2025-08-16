@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.StartOffset
+import androidx.compose.animation.core.StartOffsetType
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -24,6 +26,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -65,6 +69,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -78,9 +83,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -560,5 +567,69 @@ fun ErrorAnimation(message: String = "Something went wrong") {
             textAlign = TextAlign.Center
         )
     }
+}
+
+@Composable
+fun ThreeDotLoading(
+    dotSize: Dp = 12.dp,
+    dotColor: Color = MaterialTheme.colorScheme.primary,
+    spacing: Dp = 8.dp
+) {
+    val infiniteTransition = rememberInfiniteTransition()
+
+    // Animations for each dot
+    val anchor1 by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    val anchor2 by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500),
+            initialStartOffset = StartOffset(250, StartOffsetType.Delay),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    val anchor3 by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500),
+            initialStartOffset = StartOffset(500, StartOffsetType.Delay),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    // Row to display dots
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(spacing),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.wrapContentSize()
+    ) {
+        Dot(dotSize, dotColor, anchor1)
+        Dot(dotSize, dotColor, anchor2)
+        Dot(dotSize, dotColor, anchor3)
+    }
+}
+
+@Composable
+fun Dot(size: Dp, color: Color, anchor: Float) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .graphicsLayer {
+                // Vertical bounce
+                translationY = -2 * size.toPx() * anchor
+                scaleX = lerp(1f, 1.25f, anchor)
+                scaleY = lerp(1f, 1.25f, anchor)
+                alpha = lerp(0.7f, 1f, anchor)
+            }
+            .background(color, shape = CircleShape)
+    )
 }
 

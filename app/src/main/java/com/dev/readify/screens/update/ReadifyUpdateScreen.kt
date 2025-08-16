@@ -1,8 +1,6 @@
 package com.dev.readify.screens.update
 
 import android.util.Log
-import android.widget.RatingBar
-import androidx.compose.material3.AlertDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,7 +35,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -67,7 +64,6 @@ import com.dev.readify.navigation.ReadifyScreens
 import com.dev.readify.screens.home.HomeScreenViewModel
 import com.dev.readify.utils.formatDate
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun ReadifyUpdateScreen(
@@ -160,9 +156,9 @@ fun ShowSimpleForm(book: MBook,
                     isFinishedReading.value = false
                 }
             },
-            enabled = book.startedReading == null
+            enabled = book.started_reading_at == null
         ) {
-            if (book.startedReading == null) {
+            if (book.started_reading_at == null) {
                 if (!isStartedReading.value) {
                     Text(text = "Start Reading")
                 } else {
@@ -173,7 +169,7 @@ fun ShowSimpleForm(book: MBook,
                     )
                 }
             } else {
-                Text("Started on: ${formatDate(book.startedReading!!)}")
+                Text("Started on: ${formatDate(book.started_reading_at!!)}")
             }
         }
 
@@ -187,9 +183,9 @@ fun ShowSimpleForm(book: MBook,
                     isStartedReading.value = false
                 }
             },
-            enabled = book.finishedReading == null
+            enabled = book.finished_reading_at == null
         ) {
-            if (book.finishedReading == null) {
+            if (book.finished_reading_at == null) {
                 if (!isFinishedReading.value) {
                     Text(text = "Mark as Read")
                 } else {
@@ -200,7 +196,7 @@ fun ShowSimpleForm(book: MBook,
                     )
                 }
             } else {
-                Text("Finished on: ${formatDate(book.finishedReading!!)}")
+                Text("Finished on: ${formatDate(book.finished_reading_at!!)}")
             }
         }
     }
@@ -220,9 +216,9 @@ fun ShowSimpleForm(book: MBook,
         val changedRating = book.rating?.toInt() != ratingVal.value
 
         val isFinishedTimeStamp =
-            if (isFinishedReading.value) Timestamp.now() else book.finishedReading
+            if (isFinishedReading.value) Timestamp.now() else book.finished_reading_at
         val isStartedTimeStamp =
-            if (isStartedReading.value) Timestamp.now() else book.startedReading
+            if (isStartedReading.value) Timestamp.now() else book.started_reading_at
 
         val bookUpdate =
             changedNotes || changedRating || isStartedReading.value || isFinishedReading.value

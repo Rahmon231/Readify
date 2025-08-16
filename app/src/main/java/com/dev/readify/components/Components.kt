@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,6 +50,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -80,6 +82,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
@@ -375,6 +378,9 @@ fun RoundedButton(label: String = "Reading",
 @Preview
 @Composable
 fun BookRating(score: Double = 4.5) {
+    val starSize = 24.dp
+    val fillFraction = (score / 5.0).coerceIn(0.0, 1.0) // 0.0 to 1.0
+
     Surface(
         modifier = Modifier
             .height(70.dp)
@@ -382,27 +388,55 @@ fun BookRating(score: Double = 4.5) {
         shape = RoundedCornerShape(56.dp),
         shadowElevation = 6.dp,
         color = Color.White
-    ){
-        Column(modifier = Modifier.padding(4.dp)) {
-            Icon(imageVector = Icons.Default.StarBorder,
-                contentDescription = "Star Icon",
-                modifier = Modifier.padding(3.dp))
-            Text(text = score.toString(),
-                style = MaterialTheme.typography.titleSmall)
+    ) {
+        Column(
+            modifier = Modifier.padding(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(modifier = Modifier.size(starSize)) {
+                // Border star (background)
+                Icon(
+                    imageVector = Icons.Default.StarBorder,
+                    contentDescription = "Star Icon",
+                    tint = Color.Gray,
+                    modifier = Modifier.fillMaxSize()
+                )
+                // Filled star overlay
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = Color(0xFFFFD700), // Yellow
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(starSize * fillFraction.toFloat()) // Clip width based on rating
+                        .align(Alignment.CenterStart)
+                        .clip(RectangleShape)
+                )
+            }
+
+            Text(
+                text = score.toString(),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
 
 
+
 @Composable
-fun ListCard(book: MBook,
-             label: String = "Reading",
-             onCardPressed: (String) -> Unit = {}){
+fun ListCard(
+    book: MBook,
+    label: String = "Reading",
+    onCardPressed: (String) -> Unit = {}
+) {
     val context = LocalContext.current
     val resources = context.resources
     val displayMetrics = resources.displayMetrics
     val screenWidth = displayMetrics.widthPixels / displayMetrics.density
     val spacing = 10.dp
+
     Card(
         shape = RoundedCornerShape(29.dp),
         colors = CardDefaults.cardColors(
@@ -419,7 +453,6 @@ fun ListCard(book: MBook,
                 Log.d("Book Details", "ListCard: ${book.id}")
                 onCardPressed.invoke(book.googleBookId.toString())
             }
-
     ) {
         Column(
             modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
@@ -437,32 +470,47 @@ fun ListCard(book: MBook,
                     modifier = Modifier
                         .height(140.dp)
                         .width(100.dp)
-                        .padding(4.dp))
+                        .padding(4.dp)
+                )
 
                 Spacer(modifier = Modifier.width(50.dp))
 
-                Column(modifier = Modifier.padding(top = 25.dp),
+                Column(
+                    modifier = Modifier.padding(top = 25.dp),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(imageVector = Icons.Default.FavoriteBorder,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FavoriteBorder,
                         contentDescription = "Fav Icon",
                         modifier = Modifier.padding(bottom = 1.dp),
-                        tint = Color.Black)
-                    BookRating(score = 4.5)
+                        tint = Color.Black
+                    )
+                    BookRating(book.rating ?: 0.0)
                 }
             }
-            Text(text = book.title.toString(),
-                modifier = Modifier.padding(4.dp),
+
+            Text(
+                text = book.title.toString(),
+                modifier = Modifier
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.Black)
-
-            Text(text = "Author: ${book.authors}",
-                modifier = Modifier.padding(4.dp),
-                style = MaterialTheme.typography.titleSmall,
                 color = Color.Black,
-                fontWeight = FontWeight.Light)
+                fontSize = 16.sp
+            )
+
+            Text(
+                text = "Author: ${book.authors}",
+                modifier = Modifier
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.DarkGray,
+                fontWeight = FontWeight.Normal,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
 
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -471,10 +519,10 @@ fun ListCard(book: MBook,
             ) {
                 RoundedButton(label = label, radius = 29)
             }
-
         }
     }
 }
+
 
 @Composable
 fun AnimatedHourglass(

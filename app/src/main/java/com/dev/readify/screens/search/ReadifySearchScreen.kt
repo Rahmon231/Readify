@@ -155,7 +155,9 @@ fun BookList(navController: NavController, searchViewModel: SearchViewModel) {
 fun BookRow(book: MBook, navController: NavController) {
     Card(
         modifier = Modifier
-            .clickable { }
+            .clickable {
+                navController.navigate(ReadifyScreens.DetailsScreen.name + "/${book.id}")
+            }
             .fillMaxWidth()
             .height(100.dp)
             .padding(3.dp),

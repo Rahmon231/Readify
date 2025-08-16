@@ -78,6 +78,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -229,10 +230,19 @@ fun ReadifyAppBar(title: String,
                             .scale(0.9f))
                 }
                 Spacer(modifier = Modifier.width(50.dp))
-                Text(text = title,
-                    color = Color.Red.copy(alpha = 0.7f),
-                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                Text(
+                    text = title,
+                    color = Color.Red.copy(alpha = 0.85f),
+                    style = TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        letterSpacing = 0.5.sp
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+
+
 
             }
         },
@@ -278,19 +288,35 @@ fun ReadifyAppBar(title: String,
 }
 
 @Composable
-fun TitleSection(modifier: Modifier = Modifier, label: String){
-    Surface(modifier = modifier
-        .padding(start = 5.dp, top = 1.dp)
+fun TitleSection(
+    modifier: Modifier = Modifier,
+    label: String,
+    fontSize: TextUnit = 20.sp,
+    fontWeight: FontWeight = FontWeight.Bold,
+    color: Color = MaterialTheme.colorScheme.onBackground
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth() // take full width
+            .padding(horizontal = 16.dp, vertical = 8.dp), // consistent padding
+        color = Color.Transparent
     ) {
-        Column() {
-            Text(text = label,
-                fontSize = 19.sp,
+        Column(
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = label,
+                fontSize = fontSize,
+                fontWeight = fontWeight,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Normal,
-                textAlign = TextAlign.Left )
+                color = color,
+                lineHeight = 26.sp, // makes multi-line text more readable
+                textAlign = TextAlign.Start
+            )
         }
     }
 }
+
 
 @Composable
 fun FABContent(onTap: () -> Unit) {
@@ -309,7 +335,7 @@ fun FABContent(onTap: () -> Unit) {
 @Composable
 fun RoundedButton(label: String = "Reading",
                   radius: Int = 70,
-                  onPress: () -> Unit = {}){
+                  onPress:  () -> Unit = {}){
     Surface(
         modifier = Modifier
             .clip(RoundedCornerShape(

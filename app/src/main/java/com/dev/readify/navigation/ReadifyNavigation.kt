@@ -1,9 +1,11 @@
 package com.dev.readify.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.dev.readify.splash.ReadifySplashScreen
 import com.dev.readify.screens.details.ReadifyDetailsScreen
 import com.dev.readify.screens.home.ReadifyHomeScreen
@@ -32,8 +34,12 @@ fun ReadifyNavigation() {
         composable(ReadifyScreens.SearchScreen.name){
             ReadifySearchScreen(navController = navController)
         }
-        composable(ReadifyScreens.DetailsScreen.name){
-            ReadifyDetailsScreen(navController = navController)
+        composable(
+            route = ReadifyScreens.DetailsScreen.name + "/{bookId}",
+            arguments = listOf(navArgument("bookId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val bookId = backStackEntry.arguments?.getString("bookId") ?: ""
+            ReadifyDetailsScreen(navController = navController, bookId = bookId)
         }
         composable(ReadifyScreens.UpdateScreen.name){
             ReadifyUpdateScreen(navController = navController)

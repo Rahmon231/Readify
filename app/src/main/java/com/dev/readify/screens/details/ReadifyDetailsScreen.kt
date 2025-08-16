@@ -91,7 +91,7 @@ fun ReadifyDetailsScreen(navController: NavController, bookId: String, detailsVi
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            AnimatedHourglass()
+                            ThreeDotLoading()
                             Spacer(modifier = Modifier.height(12.dp))
                             Text("Loading book details...",
                                 style = MaterialTheme.typography.bodyMedium)

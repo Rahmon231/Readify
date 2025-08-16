@@ -5,6 +5,7 @@ import com.dev.readify.repository.AuthenticationRepository
 import com.dev.readify.repository.AuthenticationRepositoryImpl
 import com.dev.readify.utils.BASE_URL
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -24,6 +25,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideBooksCollection(db: FirebaseFirestore): CollectionReference {
+        return db.collection("books")
+    }
 
     @Provides
     @Singleton

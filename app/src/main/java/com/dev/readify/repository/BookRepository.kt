@@ -59,6 +59,31 @@ class BookRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun updateBook(bookId: String, updates: Map<String, Any>): BookState<Unit> {
+        return try {
+            booksCollection.document(bookId)
+                .update(updates)
+                .await()
+            BookState.Success(Unit)
+        } catch (e: Exception) {
+            BookState.Failure(e)
+        }
+    }
+
+    suspend fun deleteBook(bookId: String): BookState<Unit> {
+        return try {
+            booksCollection.document(bookId)
+                .delete()
+                .await()
+            BookState.Success(Unit)
+        } catch (e: Exception) {
+            BookState.Failure(e)
+        }
+    }
+
+
+
     suspend fun getAllBooks(): BookState<List<MBook>> {
         return try {
             val userId = authenticationRepository.userUid()

@@ -1,5 +1,8 @@
 package com.dev.readify.model
 
+import com.google.firebase.Timestamp
+import com.google.firebase.database.PropertyName
+
 data class MBook(
     val id: String? = null,
     val title: String? = null,
@@ -13,4 +16,12 @@ data class MBook(
     val googleBookId: String? = null,
     val userId: String? = null,
     val pageCount: Int? = null,
-)
+    @get:PropertyName("started_reading_at")
+    @set:PropertyName("started_reading_at")
+    var startedReading: Timestamp? = null,
+
+    @get:PropertyName("finished_reading_at")
+    @set:PropertyName("finished_reading_at")
+    var finishedReading: Timestamp? = null,
+
+    )

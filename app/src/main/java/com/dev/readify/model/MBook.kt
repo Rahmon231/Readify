@@ -18,10 +18,10 @@ data class MBook(
     val pageCount: Int? = null,
     @get:PropertyName("started_reading_at")
     @set:PropertyName("started_reading_at")
-    var startedReading: Timestamp? = null,
+    var started_reading_at: Timestamp? = null,
 
     @get:PropertyName("finished_reading_at")
     @set:PropertyName("finished_reading_at")
-    var finishedReading: Timestamp? = null,
+    var finished_reading_at: Timestamp? = null,
 
     )

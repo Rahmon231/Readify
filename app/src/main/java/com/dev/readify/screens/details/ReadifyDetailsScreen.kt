@@ -75,7 +75,7 @@ fun ReadifyDetailsScreen(navController: NavController, bookId: String, detailsVi
             icon = Icons.AutoMirrored.Filled.ArrowBack,
             showProfile = false,
             navController = navController){
-            navController.navigate(ReadifyScreens.SearchScreen.name)
+            navController.popBackStack()
         }
     }) {
         Surface(

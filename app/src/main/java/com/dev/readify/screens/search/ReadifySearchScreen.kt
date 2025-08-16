@@ -52,6 +52,7 @@ import com.dev.readify.R
 import com.dev.readify.components.AnimatedHourglass
 import com.dev.readify.components.ErrorAnimation
 import com.dev.readify.components.InputField
+import com.dev.readify.components.NoBooksFoundAnimation
 import com.dev.readify.components.ReadifyAppBar
 import com.dev.readify.data.BookState
 import com.dev.readify.model.Book
@@ -126,29 +127,35 @@ fun ReadifySearchScreen(navController: NavController,
 @Composable
 fun BookList(navController: NavController, searchViewModel: SearchViewModel) {
     val bookState by searchViewModel.bookState.collectAsState()
-    //val listOfBooks = searchViewModel.listOfDummyBooks.collectAsState()
     val listOfBooks = when (bookState) {
-        is BookState.Success -> (bookState as BookState.Success<Book>).data.items
+        is BookState.Success -> (bookState as BookState.Success<Book>).data.items ?: emptyList()
         else -> emptyList()
     }
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        items(items = listOfBooks){ book ->
-            BookRow(
-                book = MBook(
-                    id = book.id ?: "",
-                    title = book.volumeInfo.title ?: "No Title",
-                    authors = book.volumeInfo.authors?.joinToString(", ") ?: "Unknown Author",
-                    notes = book.volumeInfo.description ?: "",
-                    photoUrl = book.volumeInfo.imageLinks?.thumbnail ?: "",
-                    categories = book.volumeInfo.categories ?: emptyList(),
-                    publishedDate = book.volumeInfo.publishedDate ?: "Unknown Date",
-                    pageCount = book.volumeInfo.pageCount ?: 0),
-                navController = navController)
+
+    if (listOfBooks.isEmpty() && bookState is BookState.Success) {
+        // Show a “No results found” message
+        NoBooksFoundAnimation()
+    }else{
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp)
+        ) {
+            items(items = listOfBooks){ book ->
+                BookRow(
+                    book = MBook(
+                        id = book.id ?: "",
+                        title = book.volumeInfo.title ?: "No Title",
+                        authors = book.volumeInfo.authors?.joinToString(", ") ?: "Unknown Author",
+                        notes = book.volumeInfo.description ?: "",
+                        photoUrl = book.volumeInfo.imageLinks?.thumbnail ?: "",
+                        categories = book.volumeInfo.categories ?: emptyList(),
+                        publishedDate = book.volumeInfo.publishedDate ?: "Unknown Date",
+                        pageCount = book.volumeInfo.pageCount ?: 0),
+                    navController = navController)
+            }
         }
     }
+
 }
 
 @Composable

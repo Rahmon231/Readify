@@ -41,8 +41,12 @@ fun ReadifyNavigation() {
             val bookId = backStackEntry.arguments?.getString("bookId") ?: ""
             ReadifyDetailsScreen(navController = navController, bookId = bookId)
         }
-        composable(ReadifyScreens.UpdateScreen.name){
-            ReadifyUpdateScreen(navController = navController)
+        composable(
+            route = ReadifyScreens.UpdateScreen.name + "/{bookId}",
+            arguments = listOf(navArgument("bookId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val bookId = backStackEntry.arguments?.getString("bookId") ?: ""
+            ReadifyUpdateScreen(navController = navController, bookId = bookId)
         }
         composable(ReadifyScreens.StatsScreen.name){
             ReadifyStatsScreen(navController = navController)

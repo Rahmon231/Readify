@@ -169,7 +169,7 @@ fun HomeContent(navController: NavController, homeScreenViewModel: HomeScreenVie
 @Composable
 fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
     HorizontalScrollableComponent(listOfBooks){ bookId ->
-       navController.navigate(ReadifyScreens.DetailsScreen.name + "/$bookId")
+       navController.navigate(ReadifyScreens.UpdateScreen.name + "/$bookId")
     }
 }
 

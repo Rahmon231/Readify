@@ -41,27 +41,24 @@ Search books from the **Google Books API**, log in with **Firebase Authenticatio
 ---
 
 ## 📂 Project Structure
-│
-├── data
-│   ├── BookState.kt               # Sealed class for handling book loading states
-│   ├── models/                    # Data classes for app entities (Book, User, etc.)
-│   └── repository/                # Repository classes for fetching and updating data
-│
-├── screens
-│   ├── home/                      # Home screen & related components
-│   ├── stats/                     # Stats screen & related components
-│   ├── update/                    # Update book screen & ViewModel
-│   └── splash/                    # Splash screen if any
-│
-├── components                      # Reusable composables like AppBar, Loading, etc.
-│
-├── utils                           # Utility functions (date formatting, etc.)
-│
-├── navigation                      # Navigation setup (NavController, routes)
-│
-├── viewmodel                       # Shared or screen-specific ViewModels
-│
-└── di                              # Dependency injection modules (Hilt)
+
+- data
+  - BookState.kt             (Sealed class for handling book loading states)
+  - models/                  (Data classes for app entities (Book, User, etc.))
+  - repository/              (Repository classes for fetching and updating data)
+
+- screens
+  - home/                  (Home screen & related components)
+  - stats/                 (Stats screen & related components)
+  - update/                (Update book screen & ViewModel)
+  - splash/                (Splash screen (if any))
+
+- components               (Reusable composables (AppBar, Loading, etc.))
+- utils                    (Utility functions (date formatting, etc.))
+- navigation               (Navigation setup (NavController, routes))
+- viewmodel                (Shared or screen-specific ViewModels)
+- di                       (Dependency injection modules (Hilt))
+
 
 
 ### 📌 Explanation

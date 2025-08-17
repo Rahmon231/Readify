@@ -25,11 +25,6 @@ Search books from the **Google Books API**, log in with **Firebase Authenticatio
   - All user data is stored in Firebase Firestore
   - Synced across devices
 
-- **🧹 Clean Architecture**
-  - **Presentation Layer**: Jetpack Compose UI
-  - **Domain Layer**: Use cases & entities
-  - **Data Layer**: Repository implementations for Firebase & Google Books API
-
 ---
 
 ## 🛠 Tech Stack
@@ -46,5 +41,34 @@ Search books from the **Google Books API**, log in with **Firebase Authenticatio
 ---
 
 ## 📂 Project Structure
+│
+├── data
+│   ├── BookState.kt               # Sealed class for handling book loading states
+│   ├── models/                    # Data classes for app entities (Book, User, etc.)
+│   └── repository/                # Repository classes for fetching and updating data
+│
+├── screens
+│   ├── home/                      # Home screen & related components
+│   ├── stats/                     # Stats screen & related components
+│   ├── update/                    # Update book screen & ViewModel
+│   └── splash/                    # Splash screen if any
+│
+├── components                      # Reusable composables like AppBar, Loading, etc.
+│
+├── utils                           # Utility functions (date formatting, etc.)
+│
+├── navigation                      # Navigation setup (NavController, routes)
+│
+├── viewmodel                       # Shared or screen-specific ViewModels
+│
+└── di                              # Dependency injection modules (Hilt)
 
---To be updated
+
+### 📌 Explanation
+- **data**: Handles models, repository, and state classes for MVVM flow.
+- **screens**: Contains all UI screens and their Compose functions. Each screen can have its own folder for organization.
+- **components**: Reusable UI elements like buttons, cards, app bars, loading indicators.
+- **utils**: General-purpose helper functions used across the app.
+- **navigation**: Centralized navigation setup using Jetpack Compose navigation.
+- **viewmodel**: All ViewModels managing UI state, interacting with repositories.
+- **di**: Hilt dependency injection modules.  

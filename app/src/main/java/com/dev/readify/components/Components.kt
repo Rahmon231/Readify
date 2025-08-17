@@ -319,7 +319,7 @@ fun TitleSection(
 ) {
     Surface(
         modifier = modifier
-            .fillMaxWidth() // take full width
+         //   .fillMaxWidth() // take full width
             .padding(horizontal = 16.dp, vertical = 8.dp), // consistent padding
         color = Color.Transparent
     ) {

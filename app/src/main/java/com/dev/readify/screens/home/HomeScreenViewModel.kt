@@ -21,6 +21,9 @@ class HomeScreenViewModel @Inject constructor(
     private val _username = MutableStateFlow<String?>(null)
     val username: StateFlow<String?> = _username
 
+    private val _userId = MutableStateFlow<String?>(null)
+    val userId: StateFlow<String?> = _userId
+
     private val _listOfBooks = MutableStateFlow<List<MBook>>(emptyList())
     val listOfBooks: StateFlow<List<MBook>> = _listOfBooks
 
@@ -32,6 +35,9 @@ class HomeScreenViewModel @Inject constructor(
             fetchBooks()
             loadDummyBooks()
             val uid = repository.userUid()
+            if (uid != null) {
+                _userId.value = uid
+            }
             if (uid.isNotEmpty()) {
                 repository.observeUsername(uid).collect { name ->
                     _username.value = name
@@ -50,6 +56,12 @@ class HomeScreenViewModel @Inject constructor(
                 _booksState.value = BookState.Failure(e)
             }
         }
+    }
+
+    suspend fun getUserId() : String{
+        val uid = repository.userUid() ?: ""
+        _userId.value = uid
+        return uid
     }
 
     private fun loadDummyBooks() {

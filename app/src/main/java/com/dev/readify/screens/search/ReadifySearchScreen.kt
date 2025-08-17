@@ -40,6 +40,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -189,10 +190,30 @@ fun BookRow(book: MBook, navController: NavController) {
                     .padding(4.dp))
 
             Column() {
-                Text(text = book.title.toString(), overflow = TextOverflow.Ellipsis)
-                Text(text = "Authors: ${book.authors}",
-                    overflow = TextOverflow.Clip,
-                    style = MaterialTheme.typography.labelMedium)
+                Text(
+                    text = book.title ?: "Untitled",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = "by ${book.authors ?: "Unknown"}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = "Published: ${book.publishedDate ?: "N/A"}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
 //                Text(text = "Date: ${book.publishedDate}",
 //                    overflow = TextOverflow.Clip,
 //                    style = MaterialTheme.typography.labelMedium)

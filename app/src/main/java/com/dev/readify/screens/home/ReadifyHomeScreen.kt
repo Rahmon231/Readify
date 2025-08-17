@@ -9,12 +9,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.LibraryBooks
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -130,9 +134,40 @@ fun HomeContent(navController: NavController, homeScreenViewModel: HomeScreenVie
 
 @Composable
 fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
-    HorizontalScrollableComponent(listOfBooks){ bookId ->
-       navController.navigate(ReadifyScreens.UpdateScreen.name + "/$bookId")
+    val readingBooks = listOfBooks.filter { it.started_reading_at == null && it.finished_reading_at == null }
+    if (readingBooks.isNotEmpty()){
+        HorizontalScrollableComponent(readingBooks){ bookId ->
+            navController.navigate(ReadifyScreens.UpdateScreen.name + "/$bookId")
+        }
+    }else {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.LibraryBooks,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                modifier = Modifier.size(64.dp)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "Your Reading List is empty",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Add some books to start building your collection 📖",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            )
+        }
     }
+
 }
 
 @Composable
@@ -155,22 +190,41 @@ fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onBookClick : (Strin
 
 @Composable
 fun ReadingNowArea(books : List<MBook>, navController: NavController){
-//    ListCard(books[0], label = "Reading Now"){ bookId ->
-//        navController.navigate(ReadifyScreens.DetailsScreen.name + "/${bookId}")
-//    }
-    // Filter books that are currently being read
+
     val readingBooks = books.filter { it.started_reading_at != null && it.finished_reading_at == null }
     if (readingBooks.isNotEmpty()) {
         HorizontalScrollableComponent(readingBooks) { bookId ->
-            navController.navigate(ReadifyScreens.DetailsScreen.name + "/$bookId")
+            navController.navigate(ReadifyScreens.UpdateScreen.name + "/$bookId")
         }
     }else {
-        Text(
-            text = "No books are being read currently",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(8.dp)
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.MenuBook,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                modifier = Modifier.size(64.dp)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "No books are being read currently",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Pick a book from your list and start your journey 📚",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            )
+        }
     }
+
 }
 
 

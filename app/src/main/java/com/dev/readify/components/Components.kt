@@ -254,7 +254,7 @@ fun ReadifyAppBar(title: String,
                 Spacer(modifier = Modifier.width(50.dp))
                 Text(
                     text = title,
-                    color = Color.Red.copy(alpha = 0.85f),
+                    color = Color(0xFF0284C7),
                     style = TextStyle(
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 20.sp,
@@ -298,7 +298,7 @@ fun ReadifyAppBar(title: String,
                 Icon(
                     imageVector = icon,
                     contentDescription = "arrow back",
-                    tint = Color.Red.copy(alpha = 0.7f),
+                    tint = Color(0xFF0284C7),
                     modifier = Modifier.clickable { onBackArrowClicked.invoke() }
                 )
 

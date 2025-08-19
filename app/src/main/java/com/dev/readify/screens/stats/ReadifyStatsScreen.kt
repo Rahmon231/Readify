@@ -1,6 +1,5 @@
 package com.dev.readify.screens.stats
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,10 +46,8 @@ fun ReadifyStatsScreen(
     val userName by homeScreenViewModel.username.collectAsState()
     val booksState by homeScreenViewModel.booksState.collectAsState()
 
-    // Maintain local finished books list for instant updates
     var finishedBooks by remember { mutableStateOf<List<MBook>>(emptyList()) }
     var readingBooks by remember { mutableStateOf<List<MBook>>(emptyList()) }
-
 
     LaunchedEffect(booksState) {
         val userBooks: List<MBook> = when (booksState) {
@@ -61,8 +58,6 @@ fun ReadifyStatsScreen(
         finishedBooks = userBooks.filter { it.finished_reading_at != null }
         readingBooks = userBooks.filter { it.finished_reading_at == null && it.started_reading_at != null }
     }
-
-
 
     Scaffold(
         topBar = {
@@ -97,7 +92,6 @@ fun ReadifyStatsScreen(
                             .padding(end = 8.dp)
                     )
 
-                    // Username
                     Text(
                         text = ("Hi, " + userName?.takeIf { it.isNotBlank() }) ?: "N/A",
                         style = MaterialTheme.typography.headlineSmall,
@@ -105,7 +99,7 @@ fun ReadifyStatsScreen(
                     )
                 }
 
-                // Stats Card
+                // Stats card
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,13 +115,13 @@ fun ReadifyStatsScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = if (readingBooks.size>1) "Currently reading: ${readingBooks.size} books"
+                            text = if (readingBooks.size > 1) "Currently reading: ${readingBooks.size} books"
                             else "Currently reading: ${readingBooks.size} book",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                         Text(
-                            text = if (finishedBooks.size>1) "Books finished: ${finishedBooks.size} books"
+                            text = if (finishedBooks.size > 1) "Books finished: ${finishedBooks.size} books"
                             else "Books finished: ${finishedBooks.size} book",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -162,12 +156,10 @@ fun ReadifyStatsScreen(
                             FinishedBookRow(
                                 book = book,
                                 onDelete = {
-                                    // Update DB
                                     updateViewModel.updateBook(
                                         bookId = book.id ?: return@FinishedBookRow,
                                         updates = mapOf("finished_reading_at" to FieldValue.delete())
                                     )
-                                    // Update local state
                                     finishedBooks = finishedBooks.filter { it.id != book.id }
                                 }
                             )
@@ -184,113 +176,163 @@ fun FinishedBookRow(
     book: MBook,
     onDelete: () -> Unit
 ) {
+    var showConfirm by remember { mutableStateOf(false) }
+
     val swipeState = rememberSwipeToDismissBoxState(
         confirmValueChange = { newValue ->
             if (newValue == SwipeToDismissBoxValue.EndToStart) {
-                onDelete()
+                showConfirm = true
             }
-            true
+            false
         }
     )
 
-    SwipeToDismissBox(
-        state = swipeState,
-        enableDismissFromEndToStart = true,
-        enableDismissFromStartToEnd = false,
-        backgroundContent = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                    //.background(Color.Red.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = Color.White,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
+    Box {
+        SwipeToDismissBox(
+            state = swipeState,
+            enableDismissFromEndToStart = true,
+            enableDismissFromStartToEnd = false,
+            backgroundContent = {
+                if (swipeState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(end = 16.dp),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.error.copy(alpha = 0.8f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
             }
+        ) {
+            BookStatsRow(
+                book = book,
+                showConfirm = showConfirm,
+                onCancel = { showConfirm = false },
+                onConfirm = {
+                    onDelete()
+                    showConfirm = false
+                }
+            )
         }
-    ) {
-        BookStatsRow(book)
     }
 }
 
-
 @Composable
-fun BookStatsRow(book: MBook) {
+fun BookStatsRow(
+    book: MBook,
+    showConfirm: Boolean = false,
+    onCancel: () -> Unit = {},
+    onConfirm: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .height(100.dp),
+            .height(120.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
-        Row(modifier = Modifier.padding(8.dp)) {
-            val imageUrl = book.photoUrl?.ifEmpty {
-                "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=80&q=80"
-            }
-
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = "Book Image",
-                contentScale = ContentScale.Crop,
+        Column {
+            Row(
                 modifier = Modifier
-                    .width(80.dp)
-                    .fillMaxHeight()
-                    .clip(RoundedCornerShape(4.dp))
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxHeight()
+                    .weight(1f)
+                    .padding(8.dp)
             ) {
-                Text(
-                    text = book.title ?: "Untitled",
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    text = "Author: ${book.authors ?: "Unknown"}",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                book.started_reading_at?.let {
-                    Text(
-                        text = "Started: ${formatDate(it)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                    )
+                val imageUrl = book.photoUrl?.ifEmpty {
+                    "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=80&q=80"
                 }
 
-                book.finished_reading_at?.let {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Book Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(80.dp)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(4.dp))
+                )
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column(
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
                     Text(
-                        text = "Finished: ${formatDate(it)}",
+                        text = book.title ?: "Untitled",
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Text(
+                        text = "Author: ${book.authors ?: "Unknown"}",
                         style = MaterialTheme.typography.bodySmall,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    book.started_reading_at?.let {
+                        Text(
+                            text = "Started: ${formatDate(it)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                        )
+                    }
+
+                    book.finished_reading_at?.let {
+                        Text(
+                            text = "Finished: ${formatDate(it)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                        )
+                    }
+                }
+
+                if ((book.rating ?: 0.0) >= 4.0) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        imageVector = Icons.Default.ThumbUp,
+                        contentDescription = "High Rating",
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.align(Alignment.Top)
                     )
                 }
             }
 
-            if ((book.rating ?: 0.0) >= 4.0) {
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    imageVector = Icons.Default.ThumbUp,
-                    contentDescription = "High Rating",
-                    tint = Color.Green.copy(alpha = 0.7f),
-                    modifier = Modifier.align(Alignment.Top)
-                )
+            if (showConfirm) {
+                Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = onCancel) {
+                        Text("Cancel")
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    TextButton(onClick = onConfirm) {
+                        Text("Delete", color = MaterialTheme.colorScheme.error)
+                    }
+                }
             }
         }
     }
